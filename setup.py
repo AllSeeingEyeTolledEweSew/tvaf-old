@@ -20,6 +20,7 @@ setup(
     entry_points={
         "console_scripts": [
             "tvaf_update = tvaf.update:main",
+            "tvaf_get_torrent = tvaf.cli.get_torrent:main",
         ]
     },
     install_requires=[

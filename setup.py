@@ -19,7 +19,7 @@ setup(
     packages=find_packages(),
     entry_points={
         "console_scripts": [
-            "tvaf_update = tvaf.update:main",
+            "tvaf_update = tvaf.cli.update:main",
             "tvaf_get_torrent = tvaf.cli.get_torrent:main",
         ]
     },

@@ -1,4 +1,5 @@
 import argparse
+import errno
 import logging
 import sys
 import os
@@ -31,6 +32,7 @@ def main():
         description="TVAF Update")
     parser.add_argument("-d", "--inodb")
     parser.add_argument("--btn")
+    parser.add_argument("--unique", action="store_true")
     parser.add_argument("tvaf_id", type=model.str_to_id)
 
     args = parser.parse_args()
@@ -58,14 +60,16 @@ def main():
                 path = os.fsdecode(os.path.join(*f[b"path"]))
                 path = os.path.join("/", str(tvaf_id), te.group.name, path)
                 dirname, filename = os.path.split(path)
-                filename = add_pseudoextension(filename, "%s.%d" % (hash, idx))
+                if args.unique:
+                    filename = add_pseudoextension(
+                        filename, "%s.%d" % (hash, idx))
                 path = os.path.join(dirname, filename)
                 inodb.mkdir_p(dirname, 0o755, uid, gid)
                 try:
                     ino = inodb.mkfile(
                         path, 0o444, hash, idx, f[b"length"], uid, gid)
                 except OSError as e:
-                    if e.errno == errno.ENOENT:
+                    if e.errno == errno.EEXIST:
                         continue
                     raise
                 inodb.setattr_ino(ino, st_ctime=t, st_mtime=t)

@@ -21,12 +21,16 @@ class TvafId(object):
 
     SCHEME = None
     REGEX = None
+    GLOBAL = None
+    SERIES = None
 
 
 class ImdbId(TvafId):
 
     REGEX = re.compile(r"(?P<imdb_id>tt[0-9]{7})")
     SCHEME = "imdb"
+    GLOBAL = True
+    SERIES = False
 
     def __init__(self, imdb_id):
         self.imdb_id = imdb_id
@@ -37,13 +41,21 @@ class ImdbId(TvafId):
 
 class TvdbId(TvafId):
 
-    REGEX = re.compile(r"(?P<series>\d+)")
+    REGEX = re.compile(r"(?P<series>\d+)(/(?P<season>\d+)(/(?P<episode>\d+))?)?")
     SCHEME = "tvdb"
+    GLOBAL = True
+    SERIES = True
 
-    def __init__(self, series):
+    def __init__(self, series, season=None, episode=None):
         self.series = int(series)
+        self.season = int(season) if season is not None else None
+        self.episode = int(episode) if episode is not None else None
 
     def __str__(self):
+        if self.season is not None and self.episode is not None:
+            return "tvdb-%d/%d/%d" % (self.series, self.season, self.episode)
+        if self.season is not None:
+            return "tvdb-%d/%d" % (self.series, self.season)
         return "tvdb-%d" % self.series
 
 
@@ -51,6 +63,8 @@ class BtnId(TvafId):
 
     REGEX = re.compile(r"(?P<btn_id>\d+)")
     SCHEME = "btn"
+    GLOBAL = False
+    SERIES = True
 
     def __init__(self, btn_id):
         self.btn_id = int(btn_id)

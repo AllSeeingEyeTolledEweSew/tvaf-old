@@ -135,7 +135,7 @@ class BtnEntry(Entry):
 class MultipartFileEntry(Entry):
 
     def __init__(self, tvaf_id, torrent_entry, file_indicies):
-        super(FileEntry, self).__init__(tvaf_id, torrent_entry)
+        super(MultipartFileEntry, self).__init__(tvaf_id, torrent_entry)
         self.file_indicies = file_indicies
 
     @property

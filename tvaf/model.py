@@ -24,6 +24,9 @@ class TvafId(object):
     GLOBAL = None
     SERIES = None
 
+    def base(self):
+        return self
+
 
 class ImdbId(TvafId):
 
@@ -57,6 +60,18 @@ class TvdbId(TvafId):
         if self.season is not None:
             return "tvdb-%d/%d" % (self.series, self.season)
         return "tvdb-%d" % self.series
+
+    def base(self):
+        if self.season is None and self.episode is None:
+            return self
+        return self.__class__(self.series)
+
+    def parent(self):
+        if self.season is not None and self.episode is not None:
+            return self.__class__(self.series, season=self.season)
+        if self.season is not None:
+            return self.__class__(self.series)
+        return None
 
 
 class BtnId(TvafId):
@@ -105,7 +120,7 @@ class Entry(object):
 
     @property
     def base_path(self):
-        parts = [str(self.tvaf_id)]
+        parts = [str(self.tvaf_id.base())]
         if self.group:
             parts.append(self.group)
         if self.edition:

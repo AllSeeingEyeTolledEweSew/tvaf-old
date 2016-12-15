@@ -44,7 +44,7 @@ class BtnEpisodeEntryFactory(object):
             group_name = te.group.name
             m = GROUP_EPISODE_REGEX.match(group_name)
             if m:
-                tvaf_id = model.BtnId(
+                tvaf_id = model.TvdbId(
                     self.tvaf_id.series, season=int(m.group("season")),
                     episode=int(m.group("episode")))
             else:

@@ -89,7 +89,7 @@ class Entry(object):
 
     @property
     def hash(self):
-        return self.torrent_entry.info_hash
+        return self.torrent_entry.info_hash.lower()
 
     @property
     def info(self):

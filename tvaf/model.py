@@ -120,6 +120,10 @@ class Entry(object):
     def edition(self):
         return None
 
+    def __str__(self):
+        return "<Entry %s hash=%s group=%s edition=%s>" % (
+            self.tvaf_id, self.hash, self.group, self.edition)
+
 
 class BtnEntry(Entry):
 
@@ -141,6 +145,13 @@ class MultipartFileEntry(Entry):
             path = os.fsdecode(os.path.join(*self.files[i][b"path"]))
             paths.append(os.path.join(self.base_path, path))
         return paths
+
+    def __str__(self):
+        return (
+            "<MultipartFileEntry %s hash=%s group=%s edition=%s "
+            "file_indices=%s>" % (
+                self.tvaf_id, self.hash, self.group, self.edition,
+                self.file_indices))
 
 
 class BtnMultipartFileEntry(BtnEntry, MultipartFileEntry):

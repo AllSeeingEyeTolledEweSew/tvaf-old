@@ -33,6 +33,7 @@ class BtnEntryFactory(object):
 class BtnEpisodeEntryFactory(object):
 
     def __init__(self, tvaf_id):
+        self.tvaf_id = tvaf_id
         self.entry_factory = BtnEntryFactory(tvaf_id)
 
     def entries(self):

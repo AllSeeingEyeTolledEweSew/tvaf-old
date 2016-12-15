@@ -26,7 +26,7 @@ class BtnEntryFactory(object):
         self.api = btn.API()
 
     def entries(self):
-        for te in self.api.getTorrentsPaged(tvdb=self.tvaf_id.series):
+        for te in self.api.getTorrentsCached(tvdb=self.tvaf_id.series):
             yield model.BtnEntry(self.tvaf_id, te)
 
 

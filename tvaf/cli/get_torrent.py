@@ -13,9 +13,9 @@ def main():
 
     api = btn.API()
 
-    sr = api.getTorrents(hash=args.hash.upper(), cache=api.CACHE_ONLY)
-    if not sr.torrents:
+    tes = api.getTorrentsCached(hash=args.hash.upper())
+    if not tes:
         return 1
-    te = sr.torrents[0]
+    te = tes[0]
     sys.stdout.buffer.write(te.raw_torrent)
     return 0

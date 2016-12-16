@@ -1,9 +1,11 @@
+import errno
+import os
 import re
 import yaml
 
 import btn
-
 from tvaf import model
+from yatfs import inodb as inodb_lib
 
 
 GROUP_EPISODE_REGEX = re.compile(
@@ -28,6 +30,45 @@ class Config(object):
         else:
             self.mountpoint = None
             self.inodb_path = None
+
+        self._inodb = None
+
+    @property
+    def inodb(self):
+        if self._inodb is None:
+            self._inodb = inodb_lib.InoDb(self.inodb_path)
+        return self._inodb
+
+    def get_factory(self, tvaf_id):
+        assert tvaf_id.SCHEME == model.TvdbId.SCHEME
+        return BtnEntryFactory(tvaf_id)
+
+    def update(self, tvaf_id):
+        factory = self.get_factory(tvaf_id)
+
+        files = []
+        for entry in factory.entries():
+            t = entry.time
+            hash = entry.hash
+            for idx, f in enumerate(entry.files):
+                path = os.path.join(
+                    "/",
+                    entry.base_path,
+                    os.fsdecode(os.path.join(*f[b"path"])))
+                dirname, filename = os.path.split(path)
+                files.append((dirname, filename, f[b"length"], hash, idx, t))
+
+        with self.inodb:
+            for dirname, filename, size, hash, idx, t in files:
+                path = os.path.join(dirname, filename)
+                self.inodb.mkdir_p(dirname, 0o755, 0, 0)
+                try:
+                    ino = self.inodb.mkfile(path, 0o444, hash, idx, size, 0, 0)
+                except OSError as e:
+                    if e.errno == errno.EEXIST:
+                        continue
+                    raise
+                self.inodb.setattr_ino(ino, st_ctime=t, st_mtime=t)
 
 
 def _get_parts(files):

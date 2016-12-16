@@ -1,4 +1,5 @@
 import re
+import yaml
 
 import btn
 
@@ -11,6 +12,22 @@ GROUP_DATE_REGEX = re.compile(
     r"(?P<y>[0-9]{4})\.(?P<m>[0-9]{2})\.(?P<d>[0-9]{2})$")
 GROUP_SEASON_REGEX = re.compile(
     r"Season (?P<season>[0-9]+)(\.(?P<part>[0-9]+))?")
+
+
+class Config(object):
+
+    NAME = "tvaf_config.yaml"
+
+    def __init__(self, path=None):
+        self.path = path
+        if path:
+            with open(path) as f:
+                config = yaml.load(f)
+            self.mountpoint = config.get("mountpoint")
+            self.inodb_path = config.get("inodb_path")
+        else:
+            self.mountpoint = None
+            self.inodb_path = None
 
 
 def _get_parts(files):

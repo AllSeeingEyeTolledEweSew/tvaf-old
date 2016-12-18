@@ -43,8 +43,9 @@ class Config(object):
         assert tvaf_id.SCHEME == model.TvdbId.SCHEME
         return BtnEntryFactory(tvaf_id)
 
-    def update(self, tvaf_id):
-        factory = self.get_factory(tvaf_id)
+    def update(self, tvaf_id, factory=None):
+        if factory is None:
+            factory = self.get_factory(tvaf_id)
 
         files = []
         for entry in factory.entries():

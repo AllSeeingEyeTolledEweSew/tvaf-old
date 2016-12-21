@@ -110,3 +110,11 @@ class BtnEpisodeEntryFactory(object):
                 continue
             parts = _get_parts(entry.files)
             yield model.BtnMultipartFileEntry(tvaf_id, te, parts)
+
+
+def get_raw_torrent(hash):
+    api = btn.API()
+    tes = api.getTorrentsCached(hash=hash.upper())
+    if not tes:
+        return b""
+    return tes[0].raw_torrent

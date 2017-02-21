@@ -210,8 +210,9 @@ class TvafDb(object):
                 condition = "value = :value"
             self.db.execute(
                 "update item set value = :value, deleted = 0, "
-                "updated_at = case when %(condition)s then updated_at else "
-                ":timestamp end "
+                "updated_at = "
+                "case when (not deleted) and %(condition)s then updated_at "
+                "else :timestamp end "
                 "where path = :path and key = :key and changes() = 0" %
                 {"condition": condition}, args)
         # self.db.executemany(

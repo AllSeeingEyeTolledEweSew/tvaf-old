@@ -38,38 +38,37 @@ class TvafDb(object):
 
     def __init__(self, db_path):
         self.db_path = db_path
-        self._db = None
-        self._lock = threading.RLock()
+        self._local = threading.local()
 
     @property
     def db(self):
-        with self._lock:
-            if self._db:
-                return self._db
-            self._db = sqlite3.connect(self.db_path)
-            self._db.execute(
-                "create table if not exists item ("
-                "path text not null, "
-                "key text not null, "
-                "value numeric, "
-                "updated_at integer not null, "
-                "deleted tinyint not null default 0, "
-                "primary key (path, key))")
-            self._db.execute(
-                "create table if not exists global ("
-                "name text not null primary key, "
-                "value numeric)")
-            self._db.execute(
-                "create index if not exists "
-                "item_on_updated_at on item (updated_at)")
-            self._db.execute(
-                "create index if not exists "
-                "item_on_key_and_updated_at on item (key, updated_at)")
-            self._db.execute(
-                "create index if not exists "
-                "item_on_key_and_value on item (key, value)")
-            self._db.execute("pragma journal_mode=wal")
-            return self._db
+        if hasattr(self._local, "db"):
+            return self._local.db
+        db = sqlite3.connect(self.db_path)
+        db.execute(
+            "create table if not exists item ("
+            "path text not null, "
+            "key text not null, "
+            "value numeric, "
+            "updated_at integer not null, "
+            "deleted tinyint not null default 0, "
+            "primary key (path, key))")
+        db.execute(
+            "create table if not exists global ("
+            "name text not null primary key, "
+            "value numeric)")
+        db.execute(
+            "create index if not exists "
+            "item_on_updated_at on item (updated_at)")
+        db.execute(
+            "create index if not exists "
+            "item_on_key_and_updated_at on item (key, updated_at)")
+        db.execute(
+            "create index if not exists "
+            "item_on_key_and_value on item (key, value)")
+        db.execute("pragma journal_mode=wal")
+        self._local.db = db
+        return db
 
     def browse(self, path):
         prev = None
@@ -121,7 +120,7 @@ class TvafDb(object):
         values = []
         args = {}
         query = "select i0.path from"
-        where_clauses = ["not deleted"]
+        where_clauses = []
         for i, (k, v) in enumerate(kwargs.iteritems()):
             if i == 0:
                 query += " item i0"
@@ -129,6 +128,7 @@ class TvafDb(object):
                 query += (
                     " inner join item i%(i)d on i0.path = i%(i)d.path" %
                     {"i": i})
+            where_clauses.append("not i%(i)d.deleted" % {"i": i})
             where_clauses.append("i%(i)d.key = :k%(i)d" % {"i": i})
             args["k%d" % i] = k
             if v is not None:
@@ -136,7 +136,9 @@ class TvafDb(object):
                 args["v%d" % i] = encode(v)
             else:
                 where_clauses.append("i%(i)d.value is None")
-        query += " where " + " and ".join(where_clauses)
+        if where_clauses:
+            query += " where " + " and ".join(where_clauses)
+        print(query)
         c = self.db.execute(query, args)
         for path, in c:
             yield path

@@ -269,7 +269,7 @@ class TvafDb(object):
             condition = (
                 "key_id in (select id from key where name in (%s))" %
                 ",".join(":k%d" % i for i in range(len(keys))))
-            for i, k in keys:
+            for i, k in enumerate(keys):
                 args["k%d" % i] = k
         self.db.execute(
             "update item set deleted = 1, updated_at = :timestamp "

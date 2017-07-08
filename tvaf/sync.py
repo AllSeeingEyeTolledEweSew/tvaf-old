@@ -8,11 +8,12 @@ from tvaf import tvdb as tvaf_tvdb
 class SyncConfig(object):
 
     def __init__(self, sync_tvdb=False, scrape_btn=False, sync_btn=False,
-                 sync_btn_fs=False):
+                 sync_btn_fs=False, sync_plex=False):
         self.sync_tvdb = sync_tvdb
         self.scrape_btn = scrape_btn
         self.sync_btn = sync_btn
         self.sync_btn_fs = sync_btn_fs
+        self.sync_plex = sync_plex
 
 
 class Syncer(object):

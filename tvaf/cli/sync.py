@@ -17,6 +17,7 @@ def main():
     parser.add_argument("--sync_btn", action="store_true")
     parser.add_argument("--sync_btn_fs", action="store_true")
     parser.add_argument("--sync_tvdb", action="store_true")
+    parser.add_argument("--sync_plex", action="store_true")
 
     args = parser.parse_args()
 
@@ -32,7 +33,8 @@ def main():
 
     sync_config = tvaf.sync.SyncConfig(
         scrape_btn=args.scrape_btn, sync_btn=args.sync_btn,
-        sync_btn_fs=args.sync_btn_fs, sync_tvdb=args.sync_tvdb)
+        sync_btn_fs=args.sync_btn_fs, sync_tvdb=args.sync_tvdb,
+        sync_plex=args.sync_plex)
 
     logging.basicConfig(
         stream=sys.stdout, level=level,

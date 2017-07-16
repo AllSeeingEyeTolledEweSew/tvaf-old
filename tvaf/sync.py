@@ -23,13 +23,6 @@ class Syncer(object):
     def __init__(self, sync_config, tvaf_config):
         self.sync_config = sync_config
         self.tvaf = tvaf_config
-        if tvaf_config:
-            self.btnapi = tvaf_config.btnapi
-            self.inodb = tvaf_config.inodb
-            self.mountpoint = tvaf_config.mountpoint
-            self.tvafdb = tvaf_config.tvafdb
-            self.tvdb = tvaf_config.tvdb
-            self.plex = tvaf_config.plex
 
         self._lock = threading.Lock()
         self._threads = {}

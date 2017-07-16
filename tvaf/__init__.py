@@ -2,6 +2,7 @@ import contextlib
 import logging
 import os
 import re
+import threading
 import urlparse
 import xml.etree.ElementTree as ElementTree
 
@@ -239,11 +240,11 @@ class Config(object):
         with open(path) as f:
             self.config = yaml.load(f)
 
-        self.tvafdb = config["tvafdb"]
-        self.inodb = config["inodb"]
-        self.tvdb = config["tvdb"]
-        self.btnapi = config["btnapi"]
-        self.plex = config["plex"]
+        self.tvafdb = self.config["tvafdb"]
+        self.inodb = self.config["inodb"]
+        self.tvdb = self.config["tvdb"]
+        self.btnapi = self.config["btnapi"]
+        self.plex = self.config["plex"]
 
         self._local = threading.local()
         self._tvaf_shows_section_id = None

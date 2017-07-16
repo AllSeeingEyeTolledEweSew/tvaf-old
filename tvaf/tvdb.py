@@ -91,6 +91,8 @@ class API(object):
                 if r.status_code != 502:
                     break
                 log().error("Got a 502, retrying.")
+            else:
+                assert False, "Retries exceeded"
             return r
 
     def call(self, method, path, data=None, headers=None, qd=None):

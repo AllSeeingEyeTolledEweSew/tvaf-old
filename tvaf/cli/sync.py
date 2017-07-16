@@ -11,7 +11,7 @@ import tvaf.sync
 def main():
     parser = argparse.ArgumentParser(description="Synchronize TVAF.")
     parser.add_argument("--verbose", "-v", action="count")
-    parser.add_argument("--tvaf_config", "-c", type=argparse.FileType("r"))
+    parser.add_argument("--tvaf_config", "-c")
 
     parser.add_argument("--scrape_btn", action="store_true")
     parser.add_argument("--sync_btn", action="store_true")

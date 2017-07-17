@@ -204,13 +204,20 @@ class SeriesSyncer(object):
 
         pagenums = set(range(l["first"], l["last"] + 1)) - set((1, ))
 
-        pool = concurrent.futures.ThreadPoolExecutor(len(pagenums))
-        page_fs = [pool.submit(self.get_episodes_page, p) for p in pagenums]
-        pages = [f.result() for f in page_fs]
+        if pagenums:
+            pool = concurrent.futures.ThreadPoolExecutor(len(pagenums))
+            page_fs = [
+                pool.submit(self.get_episodes_page, p) for p in pagenums]
+            pages = [f.result() for f in page_fs]
+        else:
+            pages = []
         episodes = {}
         for page in [page1] + pages:
             for e in page["data"]:
                 episodes[e["id"]] = e
+
+        if not episodes:
+            return []
 
         pool = concurrent.futures.ThreadPoolExecutor(len(episodes))
         fs = [

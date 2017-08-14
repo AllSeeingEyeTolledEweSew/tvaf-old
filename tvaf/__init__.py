@@ -224,7 +224,7 @@ class PlexAPI(object):
     def get_global_int(self, name):
         try:
             return int(self.get_global(name))
-        except ValueError:
+        except TypeError:
             return None
 
     def set_global(self, name, value):
@@ -237,7 +237,9 @@ class PlexAPI(object):
 class Config(object):
 
     def __init__(self, path):
-        with open(path) as f:
+        self.path = path
+
+        with open(self.path) as f:
             self.config = yaml.load(f)
 
         self.tvafdb = self.config["tvafdb"]
@@ -247,7 +249,7 @@ class Config(object):
         self.plex = self.config["plex"]
 
         self._local = threading.local()
-        self._tvaf_shows_section_id = None
+        self._shows_section_id = None
 
     @property
     def mountpoint(self):
@@ -260,9 +262,9 @@ class Config(object):
         return get_default_plex_home()
 
     @property
-    def shows_tvaf_section_id(self):
-        if self._shows_tvaf_section_id is not None:
-            return self._shows_tvaf_section_id
+    def shows_section_id(self):
+        if self._shows_section_id is not None:
+            return self._shows_section_id
         with self.plex.db:
             for row in self.plex.db.cursor().execute(
                     "select section_locations.root_path, library_sections.id "
@@ -274,7 +276,7 @@ class Config(object):
                 path, id = row
                 path = os.path.join(path, CONFIG_NAME)
                 if path == self.path:
-                    self._shows_tvaf_section_id = id
+                    self._shows_section_id = id
                     return id
             self.plex.db.cursor().execute(
                 "insert into library_sections "
@@ -289,7 +291,7 @@ class Config(object):
                 "(library_section_id, root_path, available) values "
                 "(?, ?, 1)",
                 (id, dirname))
-            self._shows_tvaf_section_id = id
+            self._shows_section_id = id
             return id
 
 

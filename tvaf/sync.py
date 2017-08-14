@@ -1,6 +1,7 @@
 import threading
 
 from btn import scrape as btn_scrape
+import tvaf
 from tvaf import btn as tvaf_btn
 from tvaf import tvdb as tvaf_tvdb
 
@@ -51,6 +52,10 @@ class Syncer(object):
     def plex(self):
         return self.tvaf.plex
 
+    @property
+    def shows_section_id(self):
+        return self.tvaf.shows_section_id
+
     def maybe_start(self, op):
         with self._lock:
             if not getattr(self.sync_config, op):
@@ -90,14 +95,14 @@ class Syncer(object):
         syncer.sync()
 
     def sync_plex_unlocked(self):
-        shows_key = "tvaf_ts_" + self.shows_tvaf_section_id
-        start_ts = self.get_plex_global_int(shows_key)
+        shows_key = "tvaf_ts_%s" % self.shows_section_id
+        start_ts = self.plex.get_global_int(shows_key)
 
         for crud in self.tvafdb.feed(
                 timestamp=start_ts, keys=("version_id", "version_uris_file")):
             with tvaf.begin(self.plex.db):
                 mi = tvaf.MediaItem.find_or_create(
-                    self.tvaf, self.shows_tvaf_section_id, version_id,
+                    self.tvaf, self.shows_section_id, version_id,
                     create=(crud.action == crud.ACTION_UPDATE))
                 if crud.action == crud.ACTION_UPDATE:
                     mi.update()

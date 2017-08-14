@@ -9,7 +9,7 @@ with open("README") as readme:
 
 setup(
     name="tvaf",
-    version="0.3.4",
+    version="0.3.5",
     description="t.v.a.f.",
     long_description=documentation,
     author="AllSeeingEyeTolledEweSew",
